@@ -5,6 +5,7 @@ const methodOverride = require('method-override');
 const Campground = require('./models/campground');
 const ejsMate = require('ejs-mate')
 const catchAsync = require('./utils/catchAsync');
+const session = require('express-session');
 const ExpressError = require('./utils/ExpressError');
 const Joi = require('joi');
 const { campgroundSchema, reviewSchema } = require('./schemas.js')
@@ -38,6 +39,19 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')))
+
+const sessionConfig = {
+    secret: 'thisshouldbeabettersecret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        // Date.now() 's unit is miliseconds, here set it to expire in one week
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
+}
+app.use(session(sessionConfig));
 
 const validateCampground = (req, res, next) => {
 
