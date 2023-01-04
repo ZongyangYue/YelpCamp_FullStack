@@ -12,6 +12,9 @@ const Joi = require('joi');
 const { campgroundSchema, reviewSchema } = require('./schemas.js')
 const { validate } = require('./models/campground');
 const Review = require('./models/review');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const User = require('./models/user')
 
 const campgrounds = require('./routes/campgrounds')
 const reviews = require('./routes/reviews')
@@ -55,6 +58,13 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 app.use(flash());
 
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 const validateCampground = (req, res, next) => {
 
 
@@ -67,6 +77,11 @@ const validateCampground = (req, res, next) => {
     }
 }
 
+app.get('/fakeUser', async (req, res) => {
+    const user = new User({ email: 'coltttt@gmail.com', username: 'colt' });
+    const newUser = await User.register(user, 'chicken');
+    res.send(newUser);
+})
 // validate review middleware
 const validateReview = (req, res, next) => {
     const { error } = reviewSchema.validate(req.body);
