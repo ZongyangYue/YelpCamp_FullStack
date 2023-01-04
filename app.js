@@ -7,7 +7,7 @@ const ejsMate = require('ejs-mate')
 const catchAsync = require('./utils/catchAsync');
 const ExpressError = require('./utils/ExpressError');
 const Joi = require('joi');
-const { campgroundSchema } = require('./schemas.js')
+const { campgroundSchema, reviewSchema } = require('./schemas.js')
 const { validate } = require('./models/campground');
 const Review = require('./models/review');
 
@@ -48,9 +48,18 @@ const validateCampground = (req, res, next) => {
     }
 }
 
-app.get('/', (req, res) => {
-    res.render('home')
-})
+// validate review middleware
+const validateReview = (req, res, next) => {
+    const { error } = reviewSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+}
+
+
 
 app.get('/campgrounds', catchAsync(async (req, res) => {
     const campgrounds = await Campground.find({});
