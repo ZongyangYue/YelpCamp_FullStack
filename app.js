@@ -6,6 +6,7 @@ const Campground = require('./models/campground');
 const ejsMate = require('ejs-mate')
 const catchAsync = require('./utils/catchAsync');
 const session = require('express-session');
+const flash = require('connect-flash');
 const ExpressError = require('./utils/ExpressError');
 const Joi = require('joi');
 const { campgroundSchema, reviewSchema } = require('./schemas.js')
@@ -52,6 +53,7 @@ const sessionConfig = {
     }
 }
 app.use(session(sessionConfig));
+app.use(flash());
 
 const validateCampground = (req, res, next) => {
 
@@ -75,6 +77,13 @@ const validateReview = (req, res, next) => {
         next();
     }
 }
+
+//flash middleware before route handlers
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+})
 
 app.use('/campgrounds', campgrounds)
 app.use('/campgrounds/:id/reviews', reviews)
