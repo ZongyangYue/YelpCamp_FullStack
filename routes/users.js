@@ -14,8 +14,12 @@ router.post('/register', catchAsync(async (req, res) => {
         const user = new User({ email, username });
         // this will hash and salt password
         const registeredUser = await User.register(user, password);
-        req.flash("Success", "Welcome to Yelp Camp!");
-        res.redirect('./campgrounds');
+        req.login(registeredUser, err => {
+            if (err) return next(err);
+            req.flash("Success", "Welcome to Yelp Camp!");
+            res.redirect('./campgrounds');
+        })
+
     } catch (e) {
         req.flash('error', e.message);
         res.redirect('register')
@@ -34,8 +38,11 @@ router.post('/login', passport.authenticate('local', { failureFlash: true, failu
 })
 
 router.get('/logout', (req, res) => {
-    req.logout();
-    req.flash('success', "Goodbye!");
-    res.redirect('/campgrounds');
+    req.logout(err => {
+        if (err) return next(err);
+        req.flash('success', "Goodbye!");
+        res.redirect('/campgrounds');
+    });
+
 })
 module.exports = router;
