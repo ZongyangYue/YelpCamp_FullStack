@@ -96,6 +96,10 @@ const validateReview = (req, res, next) => {
 
 //flash middleware before route handlers
 app.use((req, res, next) => {
+    if (!['/login', '/'].includes(req.originalUrl)) {
+        //store the url they are requesting
+        req.session.returnTo = req.originalUrl
+    }
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
