@@ -15,20 +15,20 @@ router.get('/new', isLoggedIn, campgrounds.renderNewForm)
 
 router.get('/:id', catchAsync(campgrounds.showCampground))
 
-// router.post('/', isLoggedIn, validateCampground, catchAsync(campgrounds.createCampground))
-router.post('/', upload.single('image'), (req, res) => {
-    console.log("a")
-    console.log(req.body)
-    try {
+router.post('/', isLoggedIn, upload.array('image'), validateCampground, catchAsync(campgrounds.createCampground))
+// router.post('/', upload.array('image'), (req, res) => {
+//     console.log("a")
+//     console.log(req.body)
+//     try {
 
-        console.log(req.body, req.file);
-        res.send("itworked");
-    } catch (e) {
-        console.log(e)
-        console.log(e.message)
-    }
+//         console.log(req.body, req.file);
+//         res.send("itworked");
+//     } catch (e) {
+//         console.log(e)
+//         console.log(e.message)
+//     }
 
-})
+// })
 
 router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(campgrounds.renderEditForm))
 
